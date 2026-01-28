@@ -1,6 +1,6 @@
-# MesoNet
+# ChemFlow
 
-#### Unifying Atomic Trajectories and Mesoscale Interactions for Predictive Modeling of Complex Mixtures
+#### A Hierarchical Neural Network for Multiscale Representation Learning in Complex Chemical Mixtures
 
 
 
@@ -11,7 +11,7 @@
 
 
 
-MesoNet is implemented using \*\*PyTorch\*\* and runs on \*\*Ubuntu\*\* with \*\*NVIDIA GeForce RTX 4090\*\* GPUs.  
+ChemFlow is implemented using \*\*PyTorch\*\* and runs on \*\*Ubuntu\*\* with \*\*NVIDIA GeForce RTX 4090\*\* GPUs.  
 
 The framework also relies on \*\*PyTorch Geometric\*\*.
 
