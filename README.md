@@ -77,7 +77,7 @@ During training, we \*\*did not\*\* perform hyperparameter tuning on the validat
 
 \*\*Note:\*\*  
 
-In practical applications, tuning hyperparameters for each property may further improve predictive performance. However, we did not perform extensive tuning due to the long training time, and because MesoNet already outperforms models reported in existing literature.
+In practical applications, tuning hyperparameters for each property may further improve predictive performance. However, we did not perform extensive tuning due to the long training time, and because ChemFlow already outperforms models reported in existing literature.
 
 
 
