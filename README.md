@@ -4,7 +4,7 @@
 
 
 
-![MesoNet Architecture](figures/ChemFlow.png)
+![ChemFlow Architecture](figures/ChemFlow.png)
 
 
 ## Code Running Conditions
