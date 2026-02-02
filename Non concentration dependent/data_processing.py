@@ -14,8 +14,9 @@ from torch_geometric.loader import DataLoader
 
 from pathlib import Path
 
-triple_csv_path = 'data/absorption wavelength.csv'
+#triple_csv_path = '/home/ubuntu/CombinS.csv'
 
+triple_csv_path = 'C:/Users/28577/Desktop/CombinS.csv'
 class MixData(Data):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -134,9 +135,6 @@ bond_featurizer = BondFeaturizer(
         "ring": {True, False},
     }
 )
-
-
-
 
 def process_molecule_hg(smiles):
     if not isinstance(smiles, str):
@@ -326,52 +324,41 @@ def process_molecule_hg(smiles):
         "nitrile": "C#N",
         "sulfhydryl": "C",
         "sulfone": "S(=O)(=O)",
-        "acetal": "C(O)C",
+        "heavy_atom_effect": "[P]",
+
         "alkyne": "C#C",
         "nitro": "O=[N+]([O-])",
         "alkene": "C=C",
         "8": "[OH2]",
-        "杂原子–O–C": "[a]-O-[#6]",
-        "杂原子–O–C2": "[a]-O-[a]",
+        "–O–C）": "[a]-O-[#6]",
+        "–O–C": "[a]-O-[a]",
         "ether": "C-O-C",
-        "bodipy_BF2_core": "[B-](F)(F)",
-        "9": "F",
-        "10": "Cl",
-        "11": "Br",
-        "12": "I",
-        "14": "C=N",
+        "halide": "[F,Cl,Br,I]",
+        "14": "N#N",
         "15": "[Si]",
+
         "16": "[N;X3;!+;!$([N]=*);!$([N]#*);!$([N]-C(=O));!$([N]-[S](=O)=O)]",
         "17": "[P;X3;!+;!$([P]=*);!$([P]#*)]",
         "18": "C=S",
-        "phosphate": "[#15;X4;v5](=O)(-O)(-O)-O",
+        "phosphate": "[!#6]=O",
         "3": "[S;X2;!+;!$([S]=*);!$([S]#*)]",
-        "磷酰（P=O，通用）": "[#15;X4;v5](=O)",
-        "S=C=S（硫-碳-硫累积）": "[#16]=C=[#16]",
-        "亚砜（S=O，非砜）": "[#16X3;!+](=O)([#6])[#6]",
-        "硫酸根": "C(=O)[O-]",
+        "（P=O）": "[#15;X4;v5](=O)",
+        "S=C=S": "[#16]=C=[#16]",
+        "（S=O）": "[#16X3;!+](=O)([#6])[#6]",
         "N=N": "N=N",
-        "trifluoromethyl": "C(F)(F)(F)",
-        "heavy_atom_effect": "[Cl,Br,I]",
-        "donor_amine": "N(C)(C)",
-        "ar_bonded_O_anion": "a-[O-]",
+
         "aromatic_5_ring": "a1aaaa1",
         "aromatic_6_ring": "a1aaaaa1",
-        "aromatic_hetero_in_ring": "[a;!#6;r]",
-        "aromatic_N_in_ring": "[n;r]",
-        "aromatic_O_in_ring": "[o;r]",
-        "aromatic_S_in_ring": "[s;r]",
-        "ar_bound_hetero": "a-[!#1;!#6]",
-        "ar_bound_N": "a-[N;!$([N]=*);!$([N]#*)]",
-        "ar_bound_S": "a-S",
 
+        "aromatic_hetero_in_ring": "[a;!#6;r]",
         "pyridine_like_N": "[nX2;r;H0]",
         "pyrrole_like_N": "[nH;r]",
         "aromatic_N_positive": "[n+;r]",
-        "aryl_quaternary_amine": "c-[N+](C)(C)C",
-        "aryl_amide":"c-C(=O)N",
-        "ar_vinylene": "c-C=C",
-        "aryl_diarylamino":  "c[NX3;H0;!+](c)(c)",
+        "O=C=S": "O=C=[#16]",
+        "（–N=C=S）": "N=C=S",
+        "（R–N3）": "[#6]-N=[N+]=[N-]",
+        "B": "[B]",
+        "H": "[H]",
     }
 
     patt_dict = {name: Chem.MolFromSmarts(s) for name, s in functional_groups_smarts.items()}
@@ -535,7 +522,7 @@ def combine_molecules_hg_2(smiles1, smiles2, x1=None, x2=None,C=None):
     global_features_nodes = torch.cat((g1exp, g2exp), dim=0)
     combined_x = torch.cat((combined_x, global_features_nodes), dim=1)
 
-    # 2 节点的有向完全图（
+
     global_edge_index = torch.tensor([[0, 1], [1, 0]], dtype=torch.long)
     global_edge_attr = torch.cat([g1.global_features, g2.global_features], dim=0)
 
@@ -597,11 +584,11 @@ class MoleculesDatasetTwo(InMemoryDataset):
 
     @property
     def raw_file_names(self):
-        return ['absorption wavelength.csv']
+        return ['Solubility.csv']
 
     @property
     def processed_file_names(self):
-        return ['absorption wavelength.pt']
+        return ['Solubility.pt']
 
     def download(self):
         pass
@@ -618,7 +605,6 @@ class MoleculesDatasetTwo(InMemoryDataset):
                 print(f"[jump#{i}] SMILES : {e}")
                 continue
             y = float(self.targets[i])
-            y = y/1000
             data.y = torch.tensor(y, dtype=torch.float32)
             datas.append(data)
 
@@ -628,6 +614,6 @@ class MoleculesDatasetTwo(InMemoryDataset):
 
 
 smiles1, smiles2, targets, concentrations = load_data_two(triple_csv_path)
-dataset = MoleculesDatasetTwo(root='absorption wavelength', smiles1=smiles1, smiles2=smiles2,
+dataset = MoleculesDatasetTwo(root='Solubility', smiles1=smiles1, smiles2=smiles2,
                               targets=targets, concentrations=concentrations)
 

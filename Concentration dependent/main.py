@@ -14,14 +14,14 @@ from torch.utils.data import Subset
 from pathlib import Path
 
 from data_processing import *
-from model.MesoNet import *
+from model.ChemFlow import *
 
 
 
 
-epochs = 250
+epochs = 180
 k_folds = 5
-batch_size =  256
+batch_size =  512
 input_dim = atom_featurizer.dim
 edge_dim = bond_featurizer.dim
 hidden_dim = 160
@@ -58,7 +58,7 @@ for fold, (train_idx, valtest_idx) in enumerate(kf.split(dataset)):
     val_loader = DataLoader(val_subset, batch_size=batch_size, shuffle=False, pin_memory=True, num_workers=0)
     test_loader = DataLoader(test_subset, batch_size=batch_size, shuffle=False, pin_memory=True, num_workers=0)
 
-    model = MesoNet(input_dim, edge_dim, hidden_dim=160, output_dim=1,
+    model = ChemFlow(input_dim, edge_dim, hidden_dim=160, output_dim=1,
                     d_group_in=160).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
     criterion = torch.nn.MSELoss()
@@ -137,6 +137,8 @@ for fold, (train_idx, valtest_idx) in enumerate(kf.split(dataset)):
         print(f"Epoch {epoch+1}/{epochs}")
         print(f"  Train RMSE: {train_rmse:.4f}, MAE: {train_mae:.4f}, R²: {train_r2:.4f}")
         print(f"  Val   RMSE: {val_rmse:.4f}, MAE: {val_mae:.4f}, R²: {val_r2:.4f}")
+        #print(f"  Test  RMSE: {test_rmse:.4f}, MAE: {test_mae:.4f}, R²: {test_r2:.4f}")
+
     test_rmse_list.append(bsettest_rmse)
     test_mae_list.append(bsettest_mae)
     test_r2_list.append(bsettest_r2)

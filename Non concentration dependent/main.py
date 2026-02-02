@@ -14,14 +14,14 @@ from torch.utils.data import Subset
 from pathlib import Path
 
 from data_processing import *
-from model.MesoNet import *
+from model.ChemFlow import *
 
 
 
 
-epochs = 500
+epochs = 300
 k_folds = 5
-batch_size =128
+batch_size =64
 input_dim = atom_featurizer.dim
 edge_dim = bond_featurizer.dim
 hidden_dim = 160
@@ -48,17 +48,17 @@ for fold, (train_idx, valtest_idx) in enumerate(kf.split(dataset)):
     train_subset = [dataset[i] for i in train_idx]
     val_subset = [dataset[i] for i in val_idx]
     test_subset = [dataset[i] for i in test_idx]
-    print(f"Fold {fold+1} 数据划分情况：")
+    print(f"Fold {fold+1}：")
     print(f"  Train: {len(train_idx)}")
     print(f"  Val:   {len(val_idx)}")
     print(f"  Test:  {len(test_idx)}")
-    print(f"  总数:  {len(train_idx) + len(val_idx) + len(test_idx)}\n")
+    print(f"  total:  {len(train_idx) + len(val_idx) + len(test_idx)}\n")
 
     train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=0)
     val_loader = DataLoader(val_subset, batch_size=batch_size, shuffle=False, pin_memory=True, num_workers=0)
     test_loader = DataLoader(test_subset, batch_size=batch_size, shuffle=False, pin_memory=True, num_workers=0)
 
-    model = MesoNet(input_dim, edge_dim, hidden_dim=160, output_dim=1,
+    model = ChemFlow(input_dim, edge_dim, hidden_dim=160, output_dim=1,
                     d_group_in=160).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
     criterion = torch.nn.MSELoss()
@@ -86,8 +86,7 @@ for fold, (train_idx, valtest_idx) in enumerate(kf.split(dataset)):
             loss = criterion(output, target)
             loss.backward()
             optimizer.step()
-            target= target * 1000
-            output = output * 1000
+
             y_train_true.extend(target.cpu().numpy().flatten())
             y_train_pred.extend(output.detach().cpu().numpy().flatten())
 
@@ -109,8 +108,7 @@ for fold, (train_idx, valtest_idx) in enumerate(kf.split(dataset)):
 
                 output = output[mask]
                 target = target[mask]
-                target = target * 1000
-                output = output * 1000
+
                 y_val_true.extend(target.cpu().numpy().flatten())
                 y_val_pred.extend(output.cpu().numpy().flatten())
 
@@ -119,7 +117,6 @@ for fold, (train_idx, valtest_idx) in enumerate(kf.split(dataset)):
         val_mae = mean_absolute_error(y_val_true, y_val_pred)
         val_r2 = r2_score(y_val_true, y_val_pred)
 
-        # 记录最优验证结果
         y_test_true, y_test_pred = [], []
         with torch.no_grad():
             for batch in test_loader:
@@ -131,8 +128,7 @@ for fold, (train_idx, valtest_idx) in enumerate(kf.split(dataset)):
 
                 output = output[mask]
                 target = target[mask]
-                target = target * 1000
-                output = output * 1000
+
                 y_test_true.extend(target.cpu().numpy().flatten())
                 y_test_pred.extend(output.cpu().numpy().flatten())
 
@@ -141,7 +137,6 @@ for fold, (train_idx, valtest_idx) in enumerate(kf.split(dataset)):
         test_mae = mean_absolute_error(y_test_true, y_test_pred)
         test_r2 = r2_score(y_test_true, y_test_pred)
 
-        # ---- 更新最佳模型 ----
         if val_rmse < best_val_rmse:
             best_val_rmse = val_rmse
             best_model_state = model.state_dict()

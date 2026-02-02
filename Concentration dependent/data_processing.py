@@ -7,14 +7,13 @@ import numpy as np
 from collections import defaultdict
 from torch_geometric.utils import coalesce
 import pandas as pd
-import numpy as np
 from torch_geometric.data import Data, InMemoryDataset
 from torch_geometric.loader import DataLoader
 
 
 from pathlib import Path
 
-triple_csv_path = 'data/Activity coefficient1.csv'
+triple_csv_path = '/data/Activity coefficient (Merged).csv'
 
 class MixData(Data):
     def __init__(self, **kwargs):
@@ -316,7 +315,7 @@ def process_molecule_hg(smiles):
     edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
     edge_attr  = torch.tensor(edge_features, dtype=torch.float32)
 
-    functional_groups_smarts = {
+    '''functional_groups_smarts = {
         "hydroxyl": "[OX2H]",
         "amine": "N=[N+]=[N-]",
         "ester": "C(=O)O",
@@ -346,26 +345,80 @@ def process_molecule_hg(smiles):
         "18": "C=S",
         "phenyl": "c1ccccc1",
 
-        "pyrrole": "c1cc[nH]c1",  # 吡咯
-        "thiophene": "c1ccsc1",  # 噻吩
+        "pyrrole": "c1cc[nH]c1", 
+        "thiophene": "c1ccsc1",
 
-        "oxazole": "c1cnoc1",  # 噁唑
-        "pyridine": "c1c[nH]nn1",  # 吡啶
-        "furan": "c1ccoc1",  # 呋喃
-        "thiazole": "c1csnc1",  # 噻吼
-        "tetrazole": "c1cnnn1",  # 四氮唑
-        "pyrimidine": "c1cncnc1",  # 嘧啶
-        "benzothiazole": "c1cc2nccs2c1",  # 苯并噻二唑
-        "benzoxazole": "c1cc2nccO2c1",  # 苯并噁唑
-        "benzopyridine": "c1cc2nccccc2c1",  # 苯并吡啶
+        "oxazole": "c1cnoc1",
+        "pyridine": "c1c[nH]nn1", 
+        "furan": "c1ccoc1", 
+        "thiazole": "c1csnc1", 
+        "tetrazole": "c1cnnn1", 
+        "pyrimidine": "c1cncnc1", 
+        "benzothiazole": "c1cc2nccs2c1",  
+        "benzoxazole": "c1cc2nccO2c1",
+        "benzopyridine": "c1cc2nccccc2c1",  
         "19": "c1ccnnc1",
 
         "20": "c1cscn1",
         "21": "c1ccncc1",
+    }'''
 
+    functional_groups_smarts = {
+        "hydroxyl": "[OX2H]",
+        "amine": "N=[N+]=[N-]",
+        "ester": "C(=O)O",
+        "aldehyde": "C=O[!#8]",
+        "methyl": "C",
+        "amide": "C(=O)N",
+        "nitrile": "C#N",
+        "sulfhydryl": "[C-SH]",
+        "sulfone": "S(=O)(=O)",
+        "phosphate": "[#15;X4;v5](=O)(-O)(-O)-O",
 
+        "3": "[S;X2;!+;!$([S]=*);!$([S]#*)]",
+        "4": "C#C",
+        "5": "[N+](=O)[O-]",
+        "6": "C-O-C",
+        "7": "C=C",
+        "8": "[OH2]",
+        "9": "F",
+        "10": "Cl",
+        "11": "Br",
+        "12": "I",
+
+        "14": "C=N",
+        "15": "[Si]",
+        "16": "[N;X3;!+;!$([N]=*);!$([N]#*);!$([N]-C(=O));!$([N]-[S](=O)=O)]",
+        "17": "[P;X3;!+;!$([P]=*);!$([P]#*)]",
+
+        "18": "C=S",
+        "phenyl": "c1ccccc1",
+        "pyrrole": "c1cc[nH]c1",
+        "thiophene": "c1ccsc1",
+        "oxazole": "c1cnoc1",
+        "pyridine": "c1c[nH]nn1",
+
+        "furan": "c1ccoc1",
+        "thiazole": "c1csnc1",
+        "tetrazole": "c1cnnn1",
+        "pyrimidine": "c1cncnc1",
+        "benzothiazole": "c1cc2nccs2c1",
+        "benzoxazole": "c1cc2nccO2c1",
+        "benzopyridine": "c1cc2nccccc2c1",
+        "19": "c1ccnnc1",
+        "20": "c1cscn1",
+        "21": "c1ccncc1",
+
+        "（P=O）": "[#15;X4;v5](=O)",
+        "S=C=S": "[#16]=C=[#16]",
+        "O=C=S）": "O=C=[#16]",
+        "（S=O）": "[#16X3;!+](=O)([#6])[#6]",
+        "（–N=C=S）": "N=C=S",
+        "–O–C": "[!#6]-O-[#6]",
+        "N2": "N#N",
 
     }
+
     patt_dict = {name: Chem.MolFromSmarts(s) for name, s in functional_groups_smarts.items()}
     group_names = list(patt_dict.keys())
     N = node_features.size(0)
