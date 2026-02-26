@@ -19,7 +19,7 @@ from model.ChemFlow import *
 
 
 
-epochs = 300
+epochs = 500
 k_folds = 5
 batch_size =64
 input_dim = atom_featurizer.dim
