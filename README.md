@@ -1,6 +1,6 @@
 # ChemFlow
 
-#### A Hierarchical Neural Network for Multiscale Representation Learning in Complex Chemical Mixtures
+#### A Hierarchical Neural Network for Multiscale Representation Learning in Chemical Mixtures
 
 
 
