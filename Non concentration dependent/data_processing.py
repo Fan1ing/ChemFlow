@@ -14,9 +14,9 @@ from torch_geometric.loader import DataLoader
 
 from pathlib import Path
 
-#triple_csv_path = '/home/ubuntu/CombinS.csv'
 
-triple_csv_path = 'C:/Users/28577/Desktop/CombinS.csv'
+
+triple_csv_path = '/data/CombinS.csv'
 class MixData(Data):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
