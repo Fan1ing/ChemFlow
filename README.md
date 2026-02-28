@@ -71,7 +71,7 @@ These examples help illustrate data preprocessing procedures and the training wo
 
 
 
-During training, we \*\*did not\*\* perform hyperparameter tuning on the validation set for each individual property before making predictions on the test set.
+During training, we **did not** perform hyperparameter tuning on the validation set for each individual property before making predictions on the test set.
 
 
 
