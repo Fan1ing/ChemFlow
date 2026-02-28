@@ -11,9 +11,9 @@
 
 
 
-ChemFlow is implemented using \*\*PyTorch\*\* and runs on \*\*Ubuntu\*\* with \*\*NVIDIA GeForce RTX 4090\*\* GPUs.  
+ChemFlow is implemented using **PyTorch** and runs on **Ubuntu** with **NVIDIA GeForce RTX 4090** GPUs.  
 
-The framework also relies on \*\*PyTorch Geometric\*\*.
+The framework also relies on **PyTorch Geometric**.
 
 
 
@@ -47,7 +47,7 @@ Please ensure the following libraries are installed:
 
 
 
-In the \*\*Concentration dependent\*\* directory, we provide:
+In the **Concentration dependent** directory, we provide:
 
 
 
@@ -75,7 +75,7 @@ During training, we **did not** perform hyperparameter tuning on the validation 
 
 
 
-\*\*Note:\*\*  
+**Note:**  
 
 In practical applications, tuning hyperparameters for each property may further improve predictive performance. However, we did not perform extensive tuning due to the long training time, and because ChemFlow already outperforms models reported in existing literature.
 
@@ -94,7 +94,7 @@ If you encounter any errors while running the code or have any questions, please
 
 
 
-📧 \*\*fanjinming@zju.edu.cn\*\*
+📧 **fanjinming@zju.edu.cn**
 
 
 
