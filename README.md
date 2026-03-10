@@ -55,7 +55,9 @@ In the **Concentration dependent** directory, we provide:
 
 \- Data generation scripts  
 
-\- Example usage based on the activity coefficient dataset  
+\- Example usage based on the activity coefficient dataset
+
+In the **Non-Concentration dependent** directory, we provide a Example of CombiSolv. 
 
 
 
