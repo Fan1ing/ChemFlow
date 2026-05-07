@@ -19,7 +19,7 @@ The framework also relies on **PyTorch Geometric**.
 
 ### Required Python Libraries
 
-Please ensure the following libraries are installed:
+Here are the packages we used along with their corresponding version：
 
 
 
