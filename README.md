@@ -23,19 +23,19 @@ Please ensure the following libraries are installed:
 
 
 
-\- numpy  
+\- numpy  2.1.2
 
-\- pandas  
+\- pandas  2.3.3
 
-\- rdkit  
+\- rdkit  2025.9.1
 
-\- scikit-learn  
+\- scikit-learn  1.7.2
 
-\- ncps  
+\- ncps  1.0.1
 
-\- torch  
+\- torch  2.9.0+cu128
 
-\- torch\_geometric  
+\- torch\_geometric  2.7.0
 
 
 
