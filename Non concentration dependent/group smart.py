@@ -1,5 +1,5 @@
 
-
+#40 fundamental functional groups
 functional_groups_smarts = {
     "hydroxyl": "[OX2H]",
     "carboxyl": "C(=O)[OH]",
@@ -41,7 +41,7 @@ functional_groups_smarts = {
     "boron": "[B]",
     "hydrogen": "[H]"
 }
-
+#absorption wavelength, emission wavelength, and lifetime
 functional_groups_smarts = {
     "hydroxyl": "[OX2H]",
     "carboxyl": "C(=O)[OH]",
