@@ -70,24 +70,20 @@ class AtomGroupBridgeFiLM(nn.Module):
         self.g2a_proj = nn.Linear(group_dim, atom_dim)
 
         self.film_gamma = nn.Sequential(
-            nn.Linear(cond_dim, group_dim+42), nn.ReLU(),
-            nn.Linear(group_dim+42, group_dim+42)
+            nn.Linear(cond_dim, group_dim), nn.ReLU(),
+            nn.Linear(group_dim, 122)
         )
         self.film_beta  = nn.Sequential(
-            nn.Linear(cond_dim, group_dim+42), nn.ReLU(),
-            nn.Linear(group_dim+42, group_dim+42)
+            nn.Linear(cond_dim, group_dim), nn.ReLU(),
+            nn.Linear(group_dim, 122)
         )
         self.a_proj_to_g = nn.Linear(atom_dim, group_dim-80)
-        self.g_proj = nn.Linear(54, group_dim-80)
+        self.g_proj = nn.Linear(40, group_dim-80)
         self.s2s_a2g = Set2Set(80, processing_steps=s2s_steps)
+        self.final = nn.Linear(202,202)
         self.merge_a2g = nn.Linear(group_dim, group_dim+42-80)
 
-        self.group_gcn1 =GeneralConv(group_dim, group_dim,attention=True)
-
-        self.group_gcn2 =GCNConv(group_dim+42, group_dim+42)
-
         self.s2s_g2a = Set2Set(group_dim, processing_steps=s2s_steps)
-        self.g_proj_to_a = nn.Linear( group_dim, atom_dim)
 
     def forward(self, x_atom, atom_idx, x_group, group_idx, edge_index_group, cond_atom,edge_attr_group=None):
         device = x_atom.device
@@ -95,7 +91,7 @@ class AtomGroupBridgeFiLM(nn.Module):
         Na, Ha = x_atom.size(0), x_atom.size(1)
 
         Gm, Dg = x_group.size(0), x_group.size(1)
-        x_group = x_group[:, 0:54]
+        x_group = x_group[:, 0:40]
         X_group = x_group
         if Gm == 0 or atom_idx.numel() == 0 or group_idx.numel() == 0:
             xg_empty = x_atom.new_zeros((0, Dg))
@@ -107,20 +103,21 @@ class AtomGroupBridgeFiLM(nn.Module):
 
 
         xg = self.merge_a2g(xg_a2g)
-        xg = torch.cat((x_group,xg),dim=1)
 
 
         cond_g = atoms_to_groups_local(cond_atom, atom_idx, group_idx, Gm, reduce='mean')
-        '''cif Gm > 0:
+        '''if Gm > 0:
             gamma = self.film_gamma(cond_g)                        # [Gm, Dg]
+
             beta  = self.film_beta(cond_g)                         # [Gm, Dg]
             xg    = gamma * xg  + beta   # [Gm, Dg]
-        else:
-            xg    = xg_from_atom  # [0, Dg] 安全路径'''
-        '''if Gm > 0 and (edge_index_group is not None) and (edge_index_group.numel() > 0):
-            xg = self.group_gcn2(xg, edge_index_group)'''
 
-        xg = torch.cat((xg, cond_g), dim=1)
+        else:
+            xg    = xg_from_atom  # [0, Dg] '''
+
+        xg = torch.cat((x_group,xg),dim=1)
+        #xg = self.final(xg)
+        xg = torch .cat((xg, cond_g), dim=1)
 
 
         '''xa_g2a = groups_to_atoms_local(xg, group_idx, atom_idx, Na, reduce='mean')  # [Na, 2*Dg]

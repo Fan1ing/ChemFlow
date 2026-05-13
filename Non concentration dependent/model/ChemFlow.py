@@ -25,17 +25,19 @@ class ChemFlow(nn.Module):
         self.K = 2
         self.mol_emb_dim = 18
 
-
         self.cross_group_attn = CrossMolGroupInter(
-            group_dim=hidden_dim + 44,
+            group_dim=hidden_dim + 42,
             K=2,
-            mol_feat_dim=hidden_dim*2+2,
-            mol_id_emb_dim=16,
+            mol_feat_dim=hidden_dim * 2 + 2,
+            mol_id_emb_dim=18,
             num_heads=4,
             use_set2set=True,
             s2s_steps=2,
-            bidirectional_cross=True
+            bidirectional_cross=True,
+            cond_dim=G_dim+C_dim,  # 这里要和 AtomGroupBridgeFiLM 里拼进去的 cond_g 维度一致
+            dropout=0.1,
         )
+
         self.attn_atom_elem   = FeatureCrossAttention(dim_in_q=feature_dim, dim_in_kv=feature_dim, model_dim=feature_dim, num_heads=4)
         self.attn_group_atom  = FeatureCrossAttention(dim_in_q=feature_dim, dim_in_kv=feature_dim, model_dim=feature_dim, num_heads=4)
         self.attn_global_group= FeatureCrossAttention(dim_in_q=G_dim, dim_in_kv=feature_dim, model_dim=feature_dim, num_heads=4)
@@ -66,18 +68,12 @@ class ChemFlow(nn.Module):
             nn.Linear(edge_hidden_dim, hidden_dim * hidden_dim)
         ), aggr='mean')
 
-        self.global_conv = NNConv(hidden_dim*2+2, hidden_dim, nn.Sequential(
-            nn.Linear(4, edge_hidden_dim), nn.ReLU(), nn.Dropout(p=0.3),
-            nn.Linear(edge_hidden_dim , (hidden_dim*2+2*C_dim)*hidden_dim)
-        ), aggr='mean')
-
 
         self.set2set  = Set2Set(hidden_dim, processing_steps=2)
-        self.set2set2 = Set2Set(3*hidden_dim+2*C_dim , processing_steps=2)
-        self.setgroup = Set2Set(238, processing_steps=2)
+        self.setgroup = Set2Set(236, processing_steps=2)
 
         self.fc = nn.Sequential(
-            nn.Linear(1136+220, 1024),
+            nn.Linear(1352, 1024),
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Linear(1024, 512),
@@ -159,8 +155,10 @@ class ChemFlow(nn.Module):
         g  = subgraph_x[:, 47+G_dim+4:47+G_dim+4+G_dim+1]
         G = subgraph_x[:, 47+G_dim+4+G_dim+1:]
 
+
         C = torch.cat((g[:, G_dim:G_dim+1],G[:, G_dim:G_dim+1]), dim=1)
-        global_G =C
+
+        global_G = g
         x2_output = self.x2(x2)
         x2_output = self.relu(x2_output)
 
@@ -271,8 +269,8 @@ class ChemFlow(nn.Module):
         expand_group = torch.cat((mix_feat,expand_group),dim=1)
 
         group_out = torch.cat((expanded_x[:, 0, :],expanded_x[:, 1, :], expand_group), dim=1)
-
         #final_x = torch.cat((group_out), dim=1)
 
         output = self.fc(group_out)
         return output
+
